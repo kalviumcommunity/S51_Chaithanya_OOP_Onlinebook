@@ -12,43 +12,50 @@ public:
     int stock;
 
     // Constructor
-    Book(string t, string a, double p, int s) : title(t), author(a), price(p), stock(s) {}
+    Book(string title, string author, double price, int stock) {
+        this->title = title;
+        this->author = author;
+        this->price = price;
+        this->stock = stock;
+    }
 
     // Member function to display book details
     void displayDetails() {
-        cout << "Title: " << title << endl;
-        cout << "Author: " << author << endl;
-        cout << "Price: $" << price << endl;
-        cout << "Stock: " << stock << " copies" << endl;
+        cout << "Title: " << this->title << endl;
+        cout << "Author: " << this->author << endl;
+        cout << "Price: $" << this->price << endl;
+        cout << "Stock: " << this->stock << " copies" << endl;
     }
 
     // Member function to update stock
-    void updateStock(int newStock) {
-        stock = newStock;
-        cout << "Stock updated to " << stock << " copies" << endl;
+    void updateStock(int stock) {
+        this->stock = stock;
+        cout << "Stock updated to " << this->stock << " copies" << endl;
     }
 };
 
 // Define the User class
 class User {
 public:
-
     string username;
     string email;
 
     // Constructor
-    User(string u, string e) : username(u), email(e) {}
+    User(string username, string email) {
+        this->username = username;
+        this->email = email;
+    }
 
     // Member function to display user information
     void displayInfo() {
-        cout << "Username: " << username << endl;
-        cout << "Email: " << email << endl;
+        cout << "Username: " << this->username << endl;
+        cout << "Email: " << this->email << endl;
     }
 
     // Member function to update email
-    void updateEmail(string newEmail) {
-        email = newEmail;
-        cout << "Email updated to " << email << endl;
+    void updateEmail(string email) {
+        this->email = email;
+        cout << "Email updated to " << this->email << endl;
     }
 };
 
