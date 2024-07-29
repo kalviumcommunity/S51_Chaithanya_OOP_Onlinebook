@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 // Define the Book class
@@ -60,27 +61,35 @@ public:
 };
 
 int main() {
-    // Instantiate Book objects
-    Book book1("The Great Gatsby", "F. Scott Fitzgerald", 10.99, 5);
-    Book book2("1984", "George Orwell", 8.99, 12);
+    // Array of Book objects
+    vector<Book> books = {
+        Book("The Great Gatsby", "F. Scott Fitzgerald", 10.99, 5),
+        Book("1984", "George Orwell", 8.99, 12),
+        Book("To Kill a Mockingbird", "Harper Lee", 12.49, 7)
+    };
 
-    // Display details and update stock
-    book1.displayDetails();
-    book1.updateStock(7);
+    // Display details and update stock for each book
+    for (Book& book : books) {
+        book.displayDetails();
+        // Example of updating stock
+        book.updateStock(book.stock + 3);  // Increase stock by 3
+        cout << endl;
+    }
 
-    book2.displayDetails();
-    book2.updateStock(15);
+    // Array of User objects
+    vector<User> users = {
+        User("Alice", "alice@gmail.com"),
+        User("Bob", "bob@gmail.com"),
+        User("Charlie", "charlie@gmail.com")
+    };
 
-    // Instantiate User objects
-    User user1("Alice", "alice@gmail.com");
-    User user2("Bob", "bob@gmail.com");
-
-    // Display information and update email
-    user1.displayInfo();
-    user1.updateEmail("alicegirl@email.com");
-
-    user2.displayInfo();
-    user2.updateEmail("bobboy@email.com");
+    // Display information and update email for each user
+    for (User& user : users) {
+        user.displayInfo();
+        // Example of updating email
+        user.updateEmail(user.email.insert(0, "new_"));  // Prefix email with "new_"
+        cout << endl;
+    }
 
     return 0;
 }
