@@ -6,7 +6,6 @@ using namespace std;
 // Define the Book class
 class Book {
 public:
-    // Attributes
     string title;
     string author;
     double price;
@@ -61,34 +60,41 @@ public:
 };
 
 int main() {
-    // Array of Book objects
-    vector<Book> books = {
-        Book("The Great Gatsby", "F. Scott Fitzgerald", 10.99, 5),
-        Book("1984", "George Orwell", 8.99, 12),
-        Book("To Kill a Mockingbird", "Harper Lee", 12.49, 7)
+    // Dynamic memory allocation for Book objects
+    vector<Book*> books = {
+        new Book("The Great Gatsby", "F. Scott Fitzgerald", 10.99, 5),
+        new Book("1984", "George Orwell", 8.99, 12),
+        new Book("To Kill a Mockingbird", "Harper Lee", 12.49, 7)
     };
 
     // Display details and update stock for each book
-    for (Book& book : books) {
-        book.displayDetails();
-        // Example of updating stock
-        book.updateStock(book.stock + 3);  // Increase stock by 3
+    for (Book* book : books) {
+        book->displayDetails();
+        book->updateStock(book->stock + 3);  // Increase stock by 3
         cout << endl;
     }
 
-    // Array of User objects
-    vector<User> users = {
-        User("Alice", "alice@gmail.com"),
-        User("Bob", "bob@gmail.com"),
-        User("Charlie", "charlie@gmail.com")
+    // Dynamic memory allocation for User objects
+    vector<User*> users = {
+        new User("Alice", "alice@gmail.com"),
+        new User("Bob", "bob@gmail.com"),
+        new User("Charlie", "charlie@gmail.com")
     };
 
     // Display information and update email for each user
-    for (User& user : users) {
-        user.displayInfo();
-        // Example of updating email
-        user.updateEmail(user.email.insert(0, "new_"));  // Prefix email with "new_"
+    for (User* user : users) {
+        user->displayInfo();
+        user->updateEmail("new_" + user->email);  // Prefix email with "new_"
         cout << endl;
+    }
+
+    // Deallocate memory
+    for (Book* book : books) {
+        delete book;
+    }
+
+    for (User* user : users) {
+        delete user;
     }
 
     return 0;
