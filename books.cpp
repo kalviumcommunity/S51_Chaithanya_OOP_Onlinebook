@@ -10,6 +10,7 @@ private:
     static double totalPrice;   
 
 public:
+    // Function to set the values of a book
     void setValues(string title, double price) {
         this->title = title;
         this->price = price;
@@ -17,11 +18,13 @@ public:
         totalPrice += price;      
     }
 
+    // Function to display the book's information
     void displayBookInfo() {
         cout << "Title: " << title << endl;
         cout << "Price: Rs" << price << endl;
     }
 
+    // Static member function to display total number of books and total price
     static void displayTotal() {
         cout << "Total number of books: " << bookCount << endl;
         cout << "Total price of all books: Rs" << totalPrice << endl;
@@ -39,6 +42,7 @@ int main() {
     cin.ignore();
     Book* arr = new Book[totalBooks];
 
+    // Input book details
     for (int i = 0; i < totalBooks; ++i) {
         string title;
         double price;
@@ -51,7 +55,8 @@ int main() {
         arr[i].setValues(title, price);
     }
 
-    cout << endl << "Book Information in arr:" << endl;
+    // Display book information
+    cout << endl << "Book Information:" << endl;
     for (int i = 0; i < totalBooks; ++i) {
         cout << "Book " << i + 1 << ":" << endl;
         arr[i].displayBookInfo();
@@ -61,6 +66,7 @@ int main() {
     // Display total number of books and the total price of all books
     Book::displayTotal();
 
+    // Free the dynamically allocated memory
     delete[] arr;
 
     return 0;
