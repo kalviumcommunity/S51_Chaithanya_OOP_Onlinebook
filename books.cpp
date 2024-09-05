@@ -10,18 +10,35 @@ private:
     static double totalPrice;   
 
 public:
-    // Function to set the values of a book
-    void setValues(string title, double price) {
+    // Constructor
+    Book() : title(""), price(0.0) {}
+
+    // Mutator (Setter) for title
+    void setTitle(string title) {
         this->title = title;
+    }
+
+    // Accessor (Getter) for title
+    string getTitle() {
+        return title;
+    }
+
+    // Mutator (Setter) for price
+    void setPrice(double price) {
         this->price = price;
+        totalPrice += price;
         bookCount++;
-        totalPrice += price;      
+    }
+
+    // Accessor (Getter) for price
+    double getPrice() {
+        return price;
     }
 
     // Function to display the book's information
     void displayBookInfo() {
-        cout << "Title: " << title << endl;
-        cout << "Price: Rs" << price << endl;
+        cout << "Title: " << getTitle() << endl;
+        cout << "Price: Rs" << getPrice() << endl;
     }
 
     // Static member function to display total number of books and total price
@@ -52,7 +69,8 @@ int main() {
         cin >> price;
         cin.ignore();
 
-        arr[i].setValues(title, price);
+        arr[i].setTitle(title);
+        arr[i].setPrice(price);
     }
 
     // Display book information
