@@ -52,40 +52,70 @@ public:
 int Book::bookCount = 0;
 double Book::totalPrice = 0.0;
 
-int main() {
+class Library {
+private:
+    string libraryName;
+    Book* books;
     int totalBooks;
+
+public:
+    // Constructor
+    Library(string name, int totalBooks) : libraryName(name), totalBooks(totalBooks) {
+        books = new Book[totalBooks];
+    }
+
+    // Destructor to free memory
+    ~Library() {
+        delete[] books;
+    }
+
+    // Function to input book details
+    void inputBookDetails() {
+        for (int i = 0; i < totalBooks; ++i) {
+            string title;
+            double price;
+            cout << "Enter title of book " << i + 1 << ": ";
+            getline(cin, title);
+            cout << "Enter price for book " << i + 1 << ": Rs";
+            cin >> price;
+            cin.ignore();
+
+            books[i].setTitle(title);
+            books[i].setPrice(price);
+        }
+    }
+
+    // Function to display library and book details
+    void displayLibraryInfo() {
+        cout << "Library: " << libraryName << endl;
+        cout << endl << "Book Information:" << endl;
+        for (int i = 0; i < totalBooks; ++i) {
+            cout << "Book " << i + 1 << ":" << endl;
+            books[i].displayBookInfo();
+            cout << endl;
+        }
+        Book::displayTotal();
+    }
+};
+
+int main() {
+    string libraryName;
+    int totalBooks;
+
+    cout << "Enter the name of the library: ";
+    getline(cin, libraryName);
     cout << "Enter the total number of books: ";
     cin >> totalBooks;
     cin.ignore();
-    Book* arr = new Book[totalBooks];
+
+    Library library(libraryName, totalBooks);
 
     // Input book details
-    for (int i = 0; i < totalBooks; ++i) {
-        string title;
-        double price;
-        cout << "Enter title of book " << i + 1 << ": ";
-        getline(cin, title);
-        cout << "Enter price for book " << i + 1 << ": Rs";
-        cin >> price;
-        cin.ignore();
+    library.inputBookDetails();
 
-        arr[i].setTitle(title);
-        arr[i].setPrice(price);
-    }
-
-    // Display book information
-    cout << endl << "Book Information:" << endl;
-    for (int i = 0; i < totalBooks; ++i) {
-        cout << "Book " << i + 1 << ":" << endl;
-        arr[i].displayBookInfo();
-        cout << endl;
-    }
-
-    // Display total number of books and the total price of all books
-    Book::displayTotal();
-
-    // Free the dynamically allocated memory
-    delete[] arr;
+    // Display library and book information
+    library.displayLibraryInfo();
 
     return 0;
 }
+ 
