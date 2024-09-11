@@ -6,12 +6,24 @@ class Book {
 private:
     string title;
     double price;
-    static int bookCount;      
-    static double totalPrice;   
+    static int bookCount;
+    static double totalPrice;
 
 public:
-    // Constructor
+    // Default Constructor
     Book() : title(""), price(0.0) {}
+
+    // Parameterized Constructor
+    Book(string title, double price) : title(title), price(price) {
+        bookCount++;
+        totalPrice += price;
+    }
+
+    // Destructor
+    ~Book() {
+        // Optional: Add any cleanup or resource deallocation if needed
+        cout << "Destructor called for book: " << title << endl;
+    }
 
     // Mutator (Setter) for title
     void setTitle(string title) {
@@ -59,14 +71,15 @@ private:
     int totalBooks;
 
 public:
-    // Constructor
+    // Parameterized Constructor
     Library(string name, int totalBooks) : libraryName(name), totalBooks(totalBooks) {
-        books = new Book[totalBooks];
+        books = new Book[totalBooks];  // Dynamically allocate array of books
     }
 
     // Destructor to free memory
     ~Library() {
-        delete[] books;
+        delete[] books;  // Release dynamically allocated memory
+        cout << "Library destructor called. Memory released for books." << endl;
     }
 
     // Function to input book details
@@ -78,10 +91,10 @@ public:
             getline(cin, title);
             cout << "Enter price for book " << i + 1 << ": Rs";
             cin >> price;
-            cin.ignore();
+            cin.ignore();  // Clear input buffer
 
-            books[i].setTitle(title);
-            books[i].setPrice(price);
+            // Use parameterized constructor to set book details
+            books[i] = Book(title, price);
         }
     }
 
@@ -94,6 +107,7 @@ public:
             books[i].displayBookInfo();
             cout << endl;
         }
+  
         Book::displayTotal();
     }
 };
@@ -106,7 +120,7 @@ int main() {
     getline(cin, libraryName);
     cout << "Enter the total number of books: ";
     cin >> totalBooks;
-    cin.ignore();
+    cin.ignore();  // Clear input buffer
 
     Library library(libraryName, totalBooks);
 
@@ -118,4 +132,3 @@ int main() {
 
     return 0;
 }
- 
