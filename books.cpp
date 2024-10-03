@@ -19,6 +19,13 @@ public:
         bookCount++;
         totalPrice += price;
     }
+
+    // Constructor Overloading: Constructor with default price
+    Book(string title) : title(title), price(100.0) { // Default price set to 100.0
+        bookCount++;
+        totalPrice += price;
+    }
+
     // Destructor
     ~Book() {
         cout << "Destructor called for book: " << title << endl;
@@ -93,14 +100,22 @@ public:
         for (int i = 0; i < totalBooks; ++i) {
             string title;
             double price;
+            char choice;
             cout << "Enter title of book " << i + 1 << ": ";
             getline(cin, title);
-            cout << "Enter price for book " << i + 1 << ": Rs";
-            cin >> price;
+
+            cout << "Do you want to enter a price? (y/n): ";
+            cin >> choice;
             cin.ignore(); // Clear input buffer
-            
-            // Use parameterized constructor to set book details
-            books[i] = Book(title, price);
+
+            if (choice == 'y' || choice == 'Y') {
+                cout << "Enter price for book " << i + 1 << ": Rs";
+                cin >> price;
+                cin.ignore(); // Clear input buffer
+                books[i] = Book(title, price);  // Parameterized constructor
+            } else {
+                books[i] = Book(title);  // Overloaded constructor with default price
+            }
         }
     }
 
