@@ -1,95 +1,153 @@
 #include <iostream>
 #include <string>
-#include <vector>
 using namespace std;
 
-// Define the Book class
+// Base class: Book
 class Book {
-public:
-    // Attributes
+private:
     string title;
-    string author;
     double price;
-    int stock;
+    static int bookCount;
+    static double totalPrice;
 
-    // Constructor
-    Book(string title, string author, double price, int stock) {
-        this->title = title;
-        this->author = author;
+public:
+    // Default Constructor
+    Book() : title(""), price(0.0) {}
+
+    // Parameterized Constructor
+    Book(string title, double price) : title(title), price(price) {
+        bookCount++;
+        totalPrice += price;
+    }
+
+    // Constructor Overloading: Constructor with default price
+    Book(string title) : title(title), price(100.0) { // Default price set to 100.0
+        bookCount++;
+        totalPrice += price;
+    }
+
+    // Destructor
+    ~Book() {
+        cout << "Destructor called for book: " << title << endl;
+    }
+
+    // Mutators and Accessors
+    void setTitle(string title) { this->title = title; }
+    string getTitle() { return title; }
+    void setPrice(double price) {
+        totalPrice -= this->price; // Adjust total price before changing
         this->price = price;
-        this->stock = stock;
+        totalPrice += price;
+    }
+    double getPrice() { return price; }
+
+    // Display book information
+    void displayBookInfo() {
+        cout << "Title: " << getTitle() << endl;
+        cout << "Price: Rs" << getPrice() << endl;
     }
 
-    // Member function to display book details
-    void displayDetails() {
-        cout << "Title: " << this->title << endl;
-        cout << "Author: " << this->author << endl;
-        cout << "Price: $" << this->price << endl;
-        cout << "Stock: " << this->stock << " copies" << endl;
-    }
-
-    // Member function to update stock
-    void updateStock(int stock) {
-        this->stock = stock;
-        cout << "Stock updated to " << this->stock << " copies" << endl;
+    // Static member function
+    static void displayTotal() {
+        cout << "Total number of books: " << bookCount << endl;
+        cout << "Total price of all books: Rs" << totalPrice << endl;
     }
 };
 
-// Define the User class
-class User {
+// Initialize static variables
+int Book::bookCount = 0;
+double Book::totalPrice = 0.0;
+
+// Derived class: EBook (Single Inheritance)
+class EBook : public Book {
+private: 
+    double fileSize; // Size in MB
+    string format; // e.g., PDF, EPUB
+
 public:
-    string username;
-    string email;
+    // Parameterized Constructor
+    EBook(string title, double price, double fileSize, string format)
+        : Book(title, price), fileSize(fileSize), format(format) {}
 
-    // Constructor
-    User(string username, string email) {
-        this->username = username;
-        this->email = email;
+    void displayBookInfo() {
+        Book::displayBookInfo(); // Call base class function
+        cout << "File Size: " << fileSize << " MB" << endl;
+        cout << "Format: " << format << endl;
+    }
+};
+
+// Derived class: Library (Multilevel Inheritance)
+class Library {
+private:
+    string libraryName;
+    Book* books;
+    int totalBooks;
+
+public:
+    // Parameterized Constructor
+    Library(string name, int totalBooks)
+        : libraryName(name), totalBooks(totalBooks) {
+        books = new Book[totalBooks]; // Dynamic allocation
     }
 
-    // Member function to display user information
-    void displayInfo() {
-        cout << "Username: " << this->username << endl;
-        cout << "Email: " << this->email << endl;
+    ~Library() {
+        delete[] books;
+        cout << "Library destructor called. Memory released for books." << endl;
     }
 
-    // Member function to update email
-    void updateEmail(string email) {
-        this->email = email;
-        cout << "Email updated to " << this->email << endl;
+    // Input book details
+    void inputBookDetails() {
+        for (int i = 0; i < totalBooks; ++i) {
+            string title;
+            double price;
+            char choice;
+            cout << "Enter title of book " << i + 1 << ": ";
+            getline(cin, title);
+
+            cout << "Do you want to enter a price? (y/n): ";
+            cin >> choice;
+            cin.ignore(); 
+
+            if (choice == 'y' || choice == 'Y') {
+                cout << "Enter price for book " << i + 1 << ": Rs";
+                cin >> price;
+                cin.ignore(); 
+                books[i] = Book(title, price);  
+            } else {
+                books[i] = Book(title); 
+            }
+        }
+    }
+
+    void displayLibraryInfo() {
+        cout << "Library: " << libraryName << endl;
+        cout << "Book Information:" << endl;
+        for (int i = 0; i < totalBooks; ++i) {
+            cout << "Book " << i + 1 << ":" << endl;
+            books[i].displayBookInfo();
+            cout << endl;
+        }
+        Book::displayTotal();
     }
 };
 
 int main() {
-    // Array of Book objects
-    vector<Book> books = {
-        Book("The Great Gatsby", "F. Scott Fitzgerald", 10.99, 5),
-        Book("1984", "George Orwell", 8.99, 12),
-        Book("To Kill a Mockingbird", "Harper Lee", 12.49, 7)
-    };
+    string libraryName;
+    int totalBooks;
 
-    // Display details and update stock for each book
-    for (Book& book : books) {
-        book.displayDetails();
-        // Example of updating stock
-        book.updateStock(book.stock + 3);  // Increase stock by 3
-        cout << endl;
-    }
+    cout << "Enter the name of the library: ";
+    getline(cin, libraryName);
+    cout << "Enter the total number of books: ";
+    cin >> totalBooks;
+    cin.ignore();
 
-    // Array of User objects
-    vector<User> users = {
-        User("Alice", "alice@gmail.com"),
-        User("Bob", "bob@gmail.com"),
-        User("Charlie", "charlie@gmail.com")
-    };
+    Library library(libraryName, totalBooks);
 
-    // Display information and update email for each user
-    for (User& user : users) {
-        user.displayInfo();
-        // Example of updating email
-        user.updateEmail(user.email.insert(0, "new_"));  // Prefix email with "new_"
-        cout << endl;
-    }
+    // Input book details
+    library.inputBookDetails();
+
+    // Display library and book information
+    library.displayLibraryInfo();
 
     return 0;
 }
