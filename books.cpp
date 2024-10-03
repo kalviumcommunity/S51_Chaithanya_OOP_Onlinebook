@@ -2,6 +2,7 @@
 #include <string>
 using namespace std;
 
+// Base class: Book
 class Book {
 private:
     string title;
@@ -18,52 +19,57 @@ public:
         bookCount++;
         totalPrice += price;
     }
-
     // Destructor
     ~Book() {
-        // Optional: Add any cleanup or resource deallocation if needed
         cout << "Destructor called for book: " << title << endl;
     }
 
-    // Mutator (Setter) for title
-    void setTitle(string title) {
-        this->title = title;
-    }
-
-    // Accessor (Getter) for title
-    string getTitle() {
-        return title;
-    }
-
-    // Mutator (Setter) for price
+    // Mutators and Accessors
+    void setTitle(string title) { this->title = title; }
+    string getTitle() { return title; }
     void setPrice(double price) {
+        totalPrice -= this->price; // Adjust total price before changing
         this->price = price;
         totalPrice += price;
-        bookCount++;
     }
+    double getPrice() { return price; }
 
-    // Accessor (Getter) for price
-    double getPrice() {
-        return price;
-    }
-
-    // Function to display the book's information
+    // Display book information
     void displayBookInfo() {
         cout << "Title: " << getTitle() << endl;
         cout << "Price: Rs" << getPrice() << endl;
     }
 
-    // Static member function to display total number of books and total price
+    // Static member function
     static void displayTotal() {
         cout << "Total number of books: " << bookCount << endl;
         cout << "Total price of all books: Rs" << totalPrice << endl;
     }
 };
 
-// Initialize static variables outside the class
+// Initialize static variables
 int Book::bookCount = 0;
 double Book::totalPrice = 0.0;
 
+// Derived class: EBook (Single Inheritance)
+class EBook : public Book {
+private: 
+    double fileSize; // Size in MB
+    string format; // e.g., PDF, EPUB
+
+public:
+    // Parameterized Constructor
+    EBook(string title, double price, double fileSize, string format)
+        : Book(title, price), fileSize(fileSize), format(format) {}
+
+    void displayBookInfo() {
+        Book::displayBookInfo(); // Call base class function
+        cout << "File Size: " << fileSize << " MB" << endl;
+        cout << "Format: " << format << endl;
+    }
+};
+
+// Derived class: Library (Multilevel Inheritance)
 class Library {
 private:
     string libraryName;
@@ -72,17 +78,17 @@ private:
 
 public:
     // Parameterized Constructor
-    Library(string name, int totalBooks) : libraryName(name), totalBooks(totalBooks) {
-        books = new Book[totalBooks];  // Dynamically allocate array of books
+    Library(string name, int totalBooks)
+        : libraryName(name), totalBooks(totalBooks) {
+        books = new Book[totalBooks]; // Dynamic allocation
     }
 
-    // Destructor to free memory
     ~Library() {
-        delete[] books;  // Release dynamically allocated memory
+        delete[] books;
         cout << "Library destructor called. Memory released for books." << endl;
     }
 
-    // Function to input book details
+    // Input book details
     void inputBookDetails() {
         for (int i = 0; i < totalBooks; ++i) {
             string title;
@@ -91,23 +97,22 @@ public:
             getline(cin, title);
             cout << "Enter price for book " << i + 1 << ": Rs";
             cin >> price;
-            cin.ignore();  // Clear input buffer
-
+            cin.ignore(); // Clear input buffer
+            
             // Use parameterized constructor to set book details
             books[i] = Book(title, price);
         }
     }
 
-    // Function to display library and book details
+    // Display library and book details
     void displayLibraryInfo() {
         cout << "Library: " << libraryName << endl;
-        cout << endl << "Book Information:" << endl;
+        cout << "Book Information:" << endl;
         for (int i = 0; i < totalBooks; ++i) {
             cout << "Book " << i + 1 << ":" << endl;
             books[i].displayBookInfo();
             cout << endl;
         }
-  
         Book::displayTotal();
     }
 };
@@ -120,7 +125,7 @@ int main() {
     getline(cin, libraryName);
     cout << "Enter the total number of books: ";
     cin >> totalBooks;
-    cin.ignore();  // Clear input buffer
+    cin.ignore();
 
     Library library(libraryName, totalBooks);
 
