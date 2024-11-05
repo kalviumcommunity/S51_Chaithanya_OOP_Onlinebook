@@ -1,56 +1,45 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 // Abstract Base class: Book
 class Book {
-private:
+protected:
     string title;
     double price;
     static int bookCount;
     static double totalPrice;
 
 public:
-    // Default Constructor
+    // Constructor Overloading: Default, Parameterized, Default Price
     Book() : title(""), price(0.0) {}
-
-    // Parameterized Constructor
     Book(string title, double price) : title(title), price(price) {
         bookCount++;
         totalPrice += price;
     }
-
-    // Constructor Overloading: Constructor with default price
-    Book(string title) : title(title), price(100.0) { // Default price set to 100.0
+    Book(string title) : title(title), price(100.0) {
         bookCount++;
         totalPrice += price;
     }
+    virtual ~Book() { cout << "Destructor called for book: " << title << endl; }
 
-    // Destructor
-    virtual ~Book() {
-        cout << "Destructor called for book: " << title << endl;
-    }
-
-    // Mutators and Accessors
+    // Accessors and Mutators
     void setTitle(string title) { this->title = title; }
-    string getTitle() { return title; }
+    string getTitle() const { return title; }
     void setPrice(double price) {
-        totalPrice -= this->price; // Adjust total price before changing
+        totalPrice -= this->price;
         this->price = price;
         totalPrice += price;
     }
-    double getPrice() { return price; }
+    double getPrice() const { return price; }
 
-    // Display book information
-    virtual void displayBookInfo() {
+    virtual void displayBookInfo() const {
         cout << "Title: " << getTitle() << endl;
         cout << "Price: Rs" << getPrice() << endl;
     }
+    virtual void displayBookType() const = 0;
 
-    // Pure virtual function
-    virtual void displayBookType() = 0; // Pure virtual function (abstract)
-
-    // Static member function
     static void displayTotal() {
         cout << "Total number of books: " << bookCount << endl;
         cout << "Total price of all books: Rs" << totalPrice << endl;
@@ -64,15 +53,12 @@ double Book::totalPrice = 0.0;
 // Derived class: PrintedBook (Single Inheritance)
 class PrintedBook : public Book {
 public:
-    // Parameterized Constructor
     PrintedBook(string title, double price) : Book(title, price) {}
-
-    void displayBookInfo() override {
-        Book::displayBookInfo(); // Call base class function
+    void displayBookInfo() const override {
+        Book::displayBookInfo();
         cout << "Book Type: Printed" << endl;
     }
-
-    void displayBookType() override {
+    void displayBookType() const override {
         cout << "This is a Printed Book." << endl;
     }
 };
@@ -80,117 +66,80 @@ public:
 // Derived class: EBook (Single Inheritance)
 class EBook : public Book {
 private:
-    double fileSize; // Size in MB
-    string format;   // e.g., PDF, EPUB
+    double fileSize;
+    string format;
 
 public:
-    // Parameterized Constructor
     EBook(string title, double price, double fileSize, string format)
         : Book(title, price), fileSize(fileSize), format(format) {}
-
-    void displayBookInfo() override {
-        Book::displayBookInfo(); // Call base class function
+    void displayBookInfo() const override {
+        Book::displayBookInfo();
         cout << "File Size: " << fileSize << " MB" << endl;
         cout << "Format: " << format << endl;
     }
-
-    void displayBookType() override {
+    void displayBookType() const override {
         cout << "This is an EBook." << endl;
     }
 };
 
-// Derived class: Library (Multilevel Inheritance)
+// Interface: IBookDisplay (Supports DIP and SRP)
+class IBookDisplay {
+public:
+    virtual void display(const Book* book) const = 0;
+};
+
+// Concrete class implementing IBookDisplay
+class BookDisplay : public IBookDisplay {
+public:
+    void display(const Book* book) const override {
+        book->displayBookInfo();
+        book->displayBookType();
+    }
+};
+
+// Library class (Updated for SRP and DIP)
 class Library {
 private:
     string libraryName;
-    Book** books; // Using pointer to an array of pointers for polymorphism
-    int totalBooks;
+    vector<Book*> books;
+    IBookDisplay* bookDisplay;
 
 public:
-    // Parameterized Constructor
-    Library(string name, int totalBooks)
-        : libraryName(name), totalBooks(totalBooks) {
-        books = new Book*[totalBooks]; // Dynamic allocation for polymorphism
+    Library(string name, IBookDisplay* displayService)
+        : libraryName(name), bookDisplay(displayService) {}
+
+    void addBook(Book* book) {
+        books.push_back(book);
     }
 
-    ~Library() {
-        for (int i = 0; i < totalBooks; ++i) {
-            delete books[i]; // Deleting dynamically allocated books
-        }
-        delete[] books;
-        cout << "Library destructor called. Memory released for books." << endl;
-    }
-
-    // Input book details
-    void inputBookDetails() {
-        for (int i = 0; i < totalBooks; ++i) {
-            string title;
-            double price;
-            char choice, bookType;
-            cout << "Enter title of book " << i + 1 << ": ";
-            getline(cin, title);
-
-            cout << "Do you want to enter a price? (y/n): ";
-            cin >> choice;
-            cin.ignore();
-
-            if (choice == 'y' || choice == 'Y') {
-                cout << "Enter price for book " << i + 1 << ": Rs";
-                cin >> price;
-                cin.ignore();
-            } else {
-                price = 100.0; // Default price
-            }
-
-            cout << "Enter book type: 'P' for Printed, 'E' for EBook: ";
-            cin >> bookType;
-            cin.ignore();
-
-            if (bookType == 'P' || bookType == 'p') {
-                books[i] = new PrintedBook(title, price);
-            } else if (bookType == 'E' || bookType == 'e') {
-                double fileSize;
-                string format;
-                cout << "Enter file size (in MB): ";
-                cin >> fileSize;
-                cin.ignore();
-                cout << "Enter format (PDF/EPUB): ";
-                getline(cin, format);
-                books[i] = new EBook(title, price, fileSize, format);
-            }
-        }
-    }
-
-    void displayLibraryInfo() {
+    void displayLibraryInfo() const {
         cout << "Library: " << libraryName << endl;
-        cout << "Book Information:" << endl;
-        for (int i = 0; i < totalBooks; ++i) {
-            cout << "Book " << i + 1 << ":" << endl;
-            books[i]->displayBookInfo(); // Polymorphic call
-            books[i]->displayBookType();  // Polymorphic call
+        for (const auto& book : books) {
+            bookDisplay->display(book);
             cout << endl;
         }
         Book::displayTotal();
     }
+
+    ~Library() {
+        for (auto book : books) {
+            delete book;
+        }
+        cout << "Library destructor called. Memory released for books." << endl;
+    }
 };
 
 int main() {
-    string libraryName;
-    int totalBooks;
+    IBookDisplay* bookDisplay = new BookDisplay;
+    Library library("City Library", bookDisplay);
 
-    cout << "Enter the name of the library: ";
-    getline(cin, libraryName);
-    cout << "Enter the total number of books: ";
-    cin >> totalBooks;
-    cin.ignore();
+    // Add books
+    library.addBook(new PrintedBook("The Great Gatsby", 300.0));
+    library.addBook(new EBook("Learn C++", 150.0, 2.5, "PDF"));
 
-    Library library(libraryName, totalBooks);
-
-    // Input book details
-    library.inputBookDetails();
-
-    // Display library and book information
+    // Display library information
     library.displayLibraryInfo();
 
+    delete bookDisplay; // Clean up dynamic memory for display
     return 0;
 }
